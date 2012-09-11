@@ -1,14 +1,51 @@
 package lengthdetection;
-import java.util.ArrayList;
-
 
 public class AnomalyBasedIDS {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		HttpURILengthNormal handleFn = new HttpURILengthNormal();
+		System.out.println("HTTP URI Length Anomaly Detection "); 
+		fileManipulate normal = new fileManipulate();
+		
+		System.out.println("Processing normal uri...");
+		normal.openFile(); //  /home/dimaz/Documents/IDSTextFiles/SaturdaySmallLen.txt
+		normal.convertFromStringToDouble();
+		
+		System.out.println("Calculate data for normal values");
+		System.out.println("Packet Count: "+ normal.getPacketCount() + "\tSum: "+ normal.getSumVal() 
+				+ "\tMean: "+ normal.getMeanVal() + "\nVariance: "+ normal.getVarianceVal()+ 
+				"\tStandard Deviation: "+ normal.getStanDevVal());
+
+		
+		System.out.println("\nComputing for Anomaly Score....");
+		normal.computeAnomalyScore();
+		
+		System.out.println("No of Anomaly Score Greater than 1.5 is: "+ normal.getNumAnomalies());
+		//Display AS table
+		normal.displayAnomalies();
+		
+		System.out.println("\nCreating Anomaly Score File for Normal data...");
+		normal.writeFile(); // /home/dimaz/Documents/IDSTextFiles/Length/SatTestMod1.txt
+		System.out.println("Done!");
+		
+		System.out.println("Detection.....");
+		detectedAttacks normalDetection = new detectedAttacks();
+		
+		normalDetection.fixedThreshold(); // set threshold
+		 
+		normalDetection.detectVal();// detect HTTP URI with AS greater than (1.5 + threshold) for Normal Data
+		normalDetection.displayDetectedAttacks(); // display results
+		
+		
+		normalDetection.writeDetectedAttacks();//Save detected Attacks in text file /home/dimaz/Documents/IDSTextFiles/Length/AfterMathMod1.txt
+		
+		
+		System.out.println("\nDone!");
+	}
+
+}
+
+/*
+ * HttpURILengthNormal handleFn = new HttpURILengthNormal();
 		HttpURILengthNotNormal handleNotNormalFn = new HttpURILengthNotNormal();
 		MiscCalculation handleExtraCalc = new MiscCalculation();
 		
@@ -30,7 +67,7 @@ public class AnomalyBasedIDS {
 		
 		System.out.println("No of Anomaly Score Greater than 1.5 is: "+ handleFn.getNumAnomalies());
 		//Display AS table
-		//handleFn.displayAnomalies();
+		handleFn.displayAnomalies();
 		
 		System.out.println("\nCreating Anomaly Score File for Normal data...");
 			handleFn.writeFile();
@@ -40,7 +77,9 @@ public class AnomalyBasedIDS {
 			handleExtraCalc.fixedThreshold(); // set threshold
 			handleExtraCalc.detectVal(handleFn.getGreaterThanAvg());// detect HTTP URI with AS greater than (1.5 + threshold) for Normal Data
 			handleExtraCalc.displayDetectedAttacks(); // display results
-			handleExtraCalc.writeDetectedAttacks();//Save detected Attacks in text file
+			
+			System.out.println("\nAttack URI for Normal:" + handleExtraCalc.getAttackURI());
+			//handleExtraCalc.writeDetectedAttacks();//Save detected Attacks in text file
 			handleExtraCalc.clearArray();
 		
 //--------------------Calculate for Non-Normal Data-------------------
@@ -63,10 +102,9 @@ public class AnomalyBasedIDS {
 		handleExtraCalc.clearArray();
 			handleExtraCalc.detectVal(handleNotNormalFn.getGreaterThanAvg());
 			handleExtraCalc.displayDetectedAttacks();
-			handleExtraCalc.writeDetectedAttacks();
+			System.out.println("\nAttack URI for not normal:" + handleExtraCalc.getAttackURI());
+			//handleExtraCalc.writeDetectedAttacks();
 	
 		
 		System.out.println("\nDone!");
-	}
-
-}
+ * */
